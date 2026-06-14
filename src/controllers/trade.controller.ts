@@ -31,32 +31,38 @@ export const createTrade = async (req: AuthRequest, res: Response): Promise<void
       return;
     }
 
-    const trade = await prisma.trade.create({
-      data: {
-        accountId: tradeData.accountId,
-        tradeDate: new Date(tradeData.tradeDate),
-        tradeTime: tradeData.tradeTime,
-        pair: tradeData.pair,
-        direction: tradeData.direction,
-        bias: tradeData.bias,
-        setup: tradeData.setup,
-        setupId: tradeData.setupId || null,
-        confidence: tradeData.confidence,
-        session: tradeData.session,
-        entryPrice: parseFloat(tradeData.entryPrice),
-        status: tradeData.status,
-        profitAmount: tradeData.profitAmount ? parseFloat(tradeData.profitAmount) : null,
-        lotSize: tradeData.lotSize ? parseFloat(tradeData.lotSize) : null,
-        rrRatio: tradeData.rrRatio ? parseFloat(tradeData.rrRatio) : null,
-        riskAmount: tradeData.riskAmount ? parseFloat(tradeData.riskAmount) : null,
-        preTradeNote: tradeData.preTradeNote,
-        executionNote: tradeData.executionNote,
-        mistakeNote: tradeData.mistakeNote,
-        lessonNote: tradeData.lessonNote,
-        imageUrlBefore: tradeData.imageUrlBefore || null,
-        userId: (req.user!.id as string),
-      },
-    });
+        let profitAmount = tradeData.profitAmount ? parseFloat(tradeData.profitAmount) : null;
+        if (profitAmount !== null) {
+          if (tradeData.status === 'Loss') profitAmount = -Math.abs(profitAmount);
+          else if (tradeData.status === 'Win') profitAmount = Math.abs(profitAmount);
+        }
+
+        const trade = await prisma.trade.create({
+          data: {
+            accountId: tradeData.accountId,
+            tradeDate: new Date(tradeData.tradeDate),
+            tradeTime: tradeData.tradeTime,
+            pair: tradeData.pair,
+            direction: tradeData.direction,
+            bias: tradeData.bias,
+            setup: tradeData.setup,
+            setupId: tradeData.setupId || null,
+            confidence: tradeData.confidence,
+            session: tradeData.session,
+            entryPrice: parseFloat(tradeData.entryPrice),
+            status: tradeData.status,
+            profitAmount: profitAmount,
+            lotSize: tradeData.lotSize ? parseFloat(tradeData.lotSize) : null,
+            rrRatio: tradeData.rrRatio ? parseFloat(tradeData.rrRatio) : null,
+            riskAmount: tradeData.riskAmount ? parseFloat(tradeData.riskAmount) : null,
+            preTradeNote: tradeData.preTradeNote,
+            executionNote: tradeData.executionNote,
+            mistakeNote: tradeData.mistakeNote,
+            lessonNote: tradeData.lessonNote,
+            imageUrlBefore: tradeData.imageUrlBefore || null,
+            userId: (req.user!.id as string),
+          },
+        });
 
     res.status(201).json(trade);
   } catch (error: any) {
@@ -102,6 +108,17 @@ export const updateTrade = async (req: AuthRequest, res: Response): Promise<void
     }
     if (updatedData.imageUrlBefore === '') {
       updatedData.imageUrlBefore = null;
+    }
+    
+    if (updatedData.profitAmount !== undefined && updatedData.profitAmount !== null) {
+      const currentStatus = updatedData.status || trade.status;
+      if (currentStatus === 'Loss') {
+        updatedData.profitAmount = -Math.abs(parseFloat(updatedData.profitAmount));
+      } else if (currentStatus === 'Win') {
+        updatedData.profitAmount = Math.abs(parseFloat(updatedData.profitAmount));
+      } else {
+        updatedData.profitAmount = parseFloat(updatedData.profitAmount);
+      }
     }
 
     const updatedTrade = await prisma.trade.update({
