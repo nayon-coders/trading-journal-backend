@@ -7,7 +7,7 @@ import path from 'path';
 export const getTrades = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const trades = await prisma.trade.findMany({
-      where: { userId: req.user?.id },
+      where: { userId: (req.user?.id as string) },
       include: { account: true, setupRelation: true },
       orderBy: { tradeDate: 'desc' },
     });
@@ -23,7 +23,7 @@ export const createTrade = async (req: AuthRequest, res: Response): Promise<void
     
     // Verify account belongs to user
     const account = await prisma.account.findFirst({
-      where: { id: tradeData.accountId, userId: req.user?.id },
+      where: { id: tradeData.accountId, userId: (req.user?.id as string) },
     });
 
     if (!account) {
@@ -54,7 +54,7 @@ export const createTrade = async (req: AuthRequest, res: Response): Promise<void
         mistakeNote: tradeData.mistakeNote,
         lessonNote: tradeData.lessonNote,
         imageUrlBefore: tradeData.imageUrlBefore || null,
-        userId: req.user!.id,
+        userId: (req.user!.id as string),
       },
     });
 
@@ -66,9 +66,9 @@ export const createTrade = async (req: AuthRequest, res: Response): Promise<void
 
 export const getTrade = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const trade = await prisma.trade.findFirst({
-      where: { id, userId: req.user?.id },
+      where: { id, userId: (req.user?.id as string) },
       include: { account: true, setupRelation: true },
     });
 
@@ -85,7 +85,7 @@ export const getTrade = async (req: AuthRequest, res: Response): Promise<void> =
 export const updateTrade = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const trade = await prisma.trade.findFirst({
-      where: { id: req.params.id, userId: req.user?.id },
+      where: { id: (req.params.id as string), userId: (req.user?.id as string) },
     });
 
     if (!trade) {
@@ -105,7 +105,7 @@ export const updateTrade = async (req: AuthRequest, res: Response): Promise<void
     }
 
     const updatedTrade = await prisma.trade.update({
-      where: { id: req.params.id },
+      where: { id: (req.params.id as string) },
       data: updatedData,
     });
 
@@ -118,7 +118,7 @@ export const updateTrade = async (req: AuthRequest, res: Response): Promise<void
 export const deleteTrade = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const trade = await prisma.trade.findFirst({
-      where: { id: req.params.id, userId: req.user?.id },
+      where: { id: (req.params.id as string), userId: (req.user?.id as string) },
     });
 
     if (!trade) {
@@ -139,7 +139,7 @@ export const deleteTrade = async (req: AuthRequest, res: Response): Promise<void
     const matches = [...allText.matchAll(imageRegex)];
     
     // Get unique filenames
-    const filenamesToDelete = [...new Set(matches.map(m => m[1]))];
+    const filenamesToDelete = [...new Set(matches.map(m => m[1] as string))];
     const uploadDir = path.join(process.cwd(), 'public', 'uploads');
 
     filenamesToDelete.forEach(filename => {
@@ -154,7 +154,7 @@ export const deleteTrade = async (req: AuthRequest, res: Response): Promise<void
     });
 
     await prisma.trade.delete({
-      where: { id: req.params.id },
+      where: { id: (req.params.id as string) },
     });
 
     res.json({ message: 'Trade removed' });

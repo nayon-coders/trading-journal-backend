@@ -67,7 +67,7 @@ const createTrade = async (req, res) => {
 exports.createTrade = createTrade;
 const getTrade = async (req, res) => {
     try {
-        const { id } = req.params;
+        const id = req.params.id;
         const trade = await index_1.prisma.trade.findFirst({
             where: { id, userId: req.user?.id },
             include: { account: true, setupRelation: true },

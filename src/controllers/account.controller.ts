@@ -6,7 +6,7 @@ import { AuthRequest } from '../middlewares/auth.middleware';
 export const getAccounts = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const accounts = await prisma.account.findMany({
-      where: { userId: req.user?.id },
+      where: { userId: (req.user?.id as string) },
       orderBy: { createdAt: 'desc' },
     });
     res.json(accounts);
@@ -27,7 +27,7 @@ export const createAccount = async (req: AuthRequest, res: Response): Promise<vo
 
     const account = await prisma.account.create({
       data: {
-        userId: req.user!.id,
+        userId: (req.user!.id as string),
         accountName,
         brokerName,
         startingBalance,
@@ -46,7 +46,7 @@ export const createAccount = async (req: AuthRequest, res: Response): Promise<vo
 export const getAccount = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const account = await prisma.account.findFirst({
-      where: { id: req.params.id, userId: req.user?.id },
+      where: { id: (req.params.id as string), userId: (req.user?.id as string) },
     });
 
     if (account) {
@@ -63,7 +63,7 @@ export const getAccount = async (req: AuthRequest, res: Response): Promise<void>
 export const updateAccount = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const account = await prisma.account.findFirst({
-      where: { id: req.params.id, userId: req.user?.id },
+      where: { id: (req.params.id as string), userId: (req.user?.id as string) },
     });
 
     if (!account) {
@@ -72,7 +72,7 @@ export const updateAccount = async (req: AuthRequest, res: Response): Promise<vo
     }
 
     const updatedAccount = await prisma.account.update({
-      where: { id: req.params.id },
+      where: { id: (req.params.id as string) },
       data: req.body,
     });
 
@@ -86,7 +86,7 @@ export const updateAccount = async (req: AuthRequest, res: Response): Promise<vo
 export const deleteAccount = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const account = await prisma.account.findFirst({
-      where: { id: req.params.id, userId: req.user?.id },
+      where: { id: (req.params.id as string), userId: (req.user?.id as string) },
     });
 
     if (!account) {
@@ -95,7 +95,7 @@ export const deleteAccount = async (req: AuthRequest, res: Response): Promise<vo
     }
 
     await prisma.account.delete({
-      where: { id: req.params.id },
+      where: { id: (req.params.id as string) },
     });
 
     res.json({ message: 'Account removed' });

@@ -5,7 +5,7 @@ import { AuthRequest } from '../middlewares/auth.middleware';
 export const getSetups = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const setups = await prisma.setup.findMany({
-      where: { userId: req.user?.id },
+      where: { userId: (req.user?.id as string) },
       orderBy: { createdAt: 'desc' },
     });
     res.json(setups);
@@ -17,7 +17,7 @@ export const getSetups = async (req: AuthRequest, res: Response): Promise<void> 
 export const createSetup = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { name, description, rules } = req.body;
-    const userId = req.user?.id;
+    const userId = (req.user?.id as string);
 
     if (!userId) {
       res.status(401).json({ message: 'Not authorized' });
@@ -46,9 +46,9 @@ export const createSetup = async (req: AuthRequest, res: Response): Promise<void
 
 export const updateSetup = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const { name, description, rules } = req.body;
-    const userId = req.user?.id;
+    const userId = (req.user?.id as string);
 
     const setup = await prisma.setup.findFirst({
       where: { id, userId },
@@ -72,11 +72,11 @@ export const updateSetup = async (req: AuthRequest, res: Response): Promise<void
 
 export const deleteSetup = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     
     // Verify ownership
     const setup = await prisma.setup.findFirst({
-      where: { id, userId: req.user?.id },
+      where: { id, userId: (req.user?.id as string) },
     });
 
     if (!setup) {

@@ -4,7 +4,7 @@ import { AuthRequest } from '../middlewares/auth.middleware';
 
 export const getDashboardStats = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const userId = req.user?.id;
+    const userId = (req.user?.id as string);
 
     const trades = await prisma.trade.findMany({
       where: { userId, status: { in: ['Win', 'Loss', 'Break Even'] } },

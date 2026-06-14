@@ -44,7 +44,7 @@ const createSetup = async (req, res) => {
 exports.createSetup = createSetup;
 const updateSetup = async (req, res) => {
     try {
-        const { id } = req.params;
+        const id = req.params.id;
         const { name, description, rules } = req.body;
         const userId = req.user?.id;
         const setup = await index_1.prisma.setup.findFirst({
@@ -67,7 +67,7 @@ const updateSetup = async (req, res) => {
 exports.updateSetup = updateSetup;
 const deleteSetup = async (req, res) => {
     try {
-        const { id } = req.params;
+        const id = req.params.id;
         // Verify ownership
         const setup = await index_1.prisma.setup.findFirst({
             where: { id, userId: req.user?.id },
