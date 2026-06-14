@@ -18,7 +18,7 @@ export const getAccounts = async (req: AuthRequest, res: Response): Promise<void
 // Create a new account
 export const createAccount = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { accountName, brokerName, startingBalance, accountType } = req.body;
+    const { accountName, brokerName, startingBalance, accountType, currency } = req.body;
     
     if (!accountName || startingBalance === undefined || !accountType) {
       res.status(400).json({ message: 'Please provide required fields' });
@@ -33,6 +33,7 @@ export const createAccount = async (req: AuthRequest, res: Response): Promise<vo
         startingBalance,
         currentBalance: startingBalance,
         accountType,
+        currency: currency || "USD",
       },
     });
 
@@ -71,9 +72,16 @@ export const updateAccount = async (req: AuthRequest, res: Response): Promise<vo
       return;
     }
 
+    const { accountName, brokerName, startingBalance, accountType, currency } = req.body;
     const updatedAccount = await prisma.account.update({
       where: { id: (req.params.id as string) },
-      data: req.body,
+      data: {
+        accountName,
+        brokerName,
+        startingBalance,
+        accountType,
+        currency,
+      },
     });
 
     res.json(updatedAccount);
