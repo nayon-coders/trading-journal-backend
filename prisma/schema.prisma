@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  accounts  Account[]
+  setups    Setup[]
+}
+
+model Setup {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  name        String
+  description String?
+  rules       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  trades      Trade[]
+}
+
+model Account {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  accountName     String
+  brokerName      String?
+  startingBalance Float
+  currentBalance  Float
+  accountType     String   // e.g., 'Funded', 'Personal', 'Prop Firm'
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  trades          Trade[]
+}
+
+model Trade {
+  id              String   @id @default(uuid())
+  userId          String
+  accountId       String
+  account         Account  @relation(fields: [accountId], references: [id])
+  tradeDate       DateTime
+  tradeTime       String
+  pair            String
+  direction       String   // 'Long' or 'Short'
+  bias            String?
+  setup           String?  // Legacy text setup
+  setupId         String?  
+  setupRelation   Setup?   @relation(fields: [setupId], references: [id])
+  confidence      String?
+  session         String?  // 'London', 'NY', 'Asian'
+  entryPrice      Float
+  stopLoss        Float?
+  takeProfit      Float?
+  riskPercent     Float?
+  lotSize         Float?
+  rrRatio         Float?
+  riskAmount      Float?
+  status          String   // 'Running', 'Win', 'Loss'
+  profitAmount    Float?
+  
+  preTradeNote    String?
+  executionNote   String?
+  mistakeNote     String?
+  lessonNote      String?
+  
+  imageUrlBefore  String?
+  imageUrlAfter   String?
+  
+  tags            String?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
