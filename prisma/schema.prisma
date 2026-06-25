@@ -21,72 +21,67 @@ model User {
 model Setup {
   id          String   @id @default(uuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id])
   name        String
   description String?
   rules       String?
-  checklist   Json?    // JSON array: [{ "id": "uuid", "label": "Check item text" }]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  checklist   Json?
+  user        User     @relation(fields: [userId], references: [id])
   trades      Trade[]
 }
 
 model Account {
   id              String   @id @default(uuid())
   userId          String
-  user            User     @relation(fields: [userId], references: [id])
   accountName     String
   brokerName      String?
   startingBalance Float
   currentBalance  Float
-  accountType     String   // e.g., 'Funded', 'Personal', 'Prop Firm'
-  environment     String   @default("Live") // 'Live' or 'Backtesting'
-  currency        String   @default("USD")
+  accountType     String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  currency        String   @default("USD")
+  environment     String   @default("Live")
+  user            User     @relation(fields: [userId], references: [id])
   trades          Trade[]
 }
 
 model Trade {
-  id              String   @id @default(uuid())
-  userId          String
-  accountId       String
-  account         Account  @relation(fields: [accountId], references: [id])
-  tradeDate       DateTime
-  tradeTime       String
-  pair            String
-  direction       String   // 'Long' or 'Short'
-  bias            String?
-  setup           String?  // Legacy text setup
-  setupId         String?  
-  setupRelation   Setup?   @relation(fields: [setupId], references: [id])
-  confidence      String?
-  session         String?  // 'London', 'NY', 'Asian'
-  entryPrice      Float
-  stopLoss        Float?
-  takeProfit      Float?
-  riskPercent     Float?
-  lotSize         Float?
-  rrRatio         Float?
-  riskAmount      Float?
-  status          String   // 'Running', 'Win', 'Loss'
-  profitAmount    Float?
-  
-  preTradeNote    String?
-  executionNote   String?
-  mistakeNote     String?
-  lessonNote      String?
-  
-  imageUrlBefore  String?
-  imageUrlAfter   String?
-  
-  tags            String?
-  
-  checklistData        Json?    // { "item-uuid": true/false, ... }
-  checklistScore       Int?     // number of checked items
-  checklistTotal       Int?     // total checklist items
-  voiceGeneratedNotes  Boolean? @default(false)
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                  String   @id @default(uuid())
+  userId              String
+  accountId           String
+  tradeDate           DateTime
+  tradeTime           String
+  pair                String
+  direction           String
+  bias                String?
+  setup               String?
+  setupId             String?
+  confidence          String?
+  session             String?
+  entryPrice          Float
+  stopLoss            Float?
+  takeProfit          Float?
+  riskPercent         Float?
+  lotSize             Float?
+  rrRatio             Float?
+  riskAmount          Float?
+  status              String
+  profitAmount        Float?
+  preTradeNote        String?
+  executionNote       String?
+  mistakeNote         String?
+  lessonNote          String?
+  imageUrlBefore      String?
+  imageUrlAfter       String?
+  tags                String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  voiceGeneratedNotes Boolean? @default(false)
+  checklistData       Json?
+  checklistScore      Int?
+  checklistTotal      Int?
+  account             Account  @relation(fields: [accountId], references: [id])
+  setupRelation       Setup?   @relation(fields: [setupId], references: [id])
 }
