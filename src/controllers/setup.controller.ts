@@ -16,7 +16,7 @@ export const getSetups = async (req: AuthRequest, res: Response): Promise<void> 
 
 export const createSetup = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { name, description, rules } = req.body;
+    const { name, description, rules, checklist } = req.body;
     const userId = (req.user?.id as string);
 
     if (!userId) {
@@ -35,6 +35,7 @@ export const createSetup = async (req: AuthRequest, res: Response): Promise<void
         name,
         description,
         rules,
+        checklist: checklist || [],
       },
     });
     
@@ -47,7 +48,7 @@ export const createSetup = async (req: AuthRequest, res: Response): Promise<void
 export const updateSetup = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const id = req.params.id as string;
-    const { name, description, rules } = req.body;
+    const { name, description, rules, checklist } = req.body;
     const userId = (req.user?.id as string);
 
     const setup = await prisma.setup.findFirst({
@@ -61,7 +62,7 @@ export const updateSetup = async (req: AuthRequest, res: Response): Promise<void
 
     const updatedSetup = await prisma.setup.update({
       where: { id },
-      data: { name, description, rules },
+      data: { name, description, rules, checklist: checklist || [] },
     });
     
     res.json(updatedSetup);

@@ -60,6 +60,10 @@ export const createTrade = async (req: AuthRequest, res: Response): Promise<void
             mistakeNote: tradeData.mistakeNote,
             lessonNote: tradeData.lessonNote,
             imageUrlBefore: tradeData.imageUrlBefore || null,
+            checklistData: tradeData.checklistData || null,
+            checklistScore: tradeData.checklistScore !== undefined && tradeData.checklistScore !== null ? parseInt(tradeData.checklistScore) : null,
+            checklistTotal: tradeData.checklistTotal !== undefined && tradeData.checklistTotal !== null ? parseInt(tradeData.checklistTotal) : null,
+            voiceGeneratedNotes: tradeData.voiceGeneratedNotes || false,
             userId: (req.user!.id as string),
           },
         });
@@ -108,6 +112,12 @@ export const updateTrade = async (req: AuthRequest, res: Response): Promise<void
     }
     if (updatedData.imageUrlBefore === '') {
       updatedData.imageUrlBefore = null;
+    }
+    if (updatedData.checklistScore !== undefined && updatedData.checklistScore !== null) {
+      updatedData.checklistScore = parseInt(updatedData.checklistScore);
+    }
+    if (updatedData.checklistTotal !== undefined && updatedData.checklistTotal !== null) {
+      updatedData.checklistTotal = parseInt(updatedData.checklistTotal);
     }
     
     if (updatedData.profitAmount !== undefined && updatedData.profitAmount !== null) {
